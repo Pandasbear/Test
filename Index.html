@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        margin: 0 10px 10px 0;
+        text-align: right;
+        width: 120px;
+      }
+
+      input[type="text"] {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        height: 30px;
+        padding: 0 10px;
+        width: 200px;
+      }
+
+      button[type="submit"] {
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        height: 30px;
+        padding: 0 20px;
+        margin-left: 10px;
+        text-transform: uppercase;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 20px auto;
+        width: 80%;
+      }
+
+      td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #4CAF50;
+        color: white;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+
+      .chart {
+        width: 500px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="filter-form">
+      <label for="volume-range">Volume Range:</label>
+      <input type="text" id="volume-range" name="volume-range">
+
+      <label for="bid-ask-spread">Bid-Ask Spread:</label>
+      <input type="text" id="bid-ask-spread" name="bid-ask-spread">
+
+      <label for="price-range">Price Range:</label>
+      <input type="text" id="price-range" name="price-range">
+
+      <button type="submit">Filter</button>
+    </form>
+
+    <table id="results">
+      <thead>
+        <tr>
+          <th>Stock Name</th>
+          <th>Ticker Symbol</th>
+          <th>Day Range</th>
+          <th>Average Volume</th>
+          <th>Industry</th>
+          <th>News</th>
+          <th>Price Chart</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+
+    <script>
+      const API_URL = 'https://api.boerse-frankfurt.de/data/stock_search';
+      const NEWS_API_URL = 'https://api.boerse-frankfurt.de/data/news';
+      const CHART_API_URL = 'https://api.boerse-frankfurt.de/data/chart';
+
+      const filterForm = document.getElementById('filter-form');
+      const resultsBody = document.getElementById('results-body');
+
+      filterForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        // Get the filter parameters from the form
+        const volumeRange = document.getElementById('volume-range').value;
+        const bidAskSpread = document.getElementById('bid-ask-spread').value;
+        const priceRange = document.getElementById('price-range').value;
+
+        // Make a request to the API to get the stock data
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        // Filter the data based on the user-specified parameters
+        const filteredData = data.filter((stock) => {
+          // Check if the volume is within the specified range
+          if (volumeRange && (stock.volume < volumeRange.min || stock.volume > volumeRange.max)) {
+            return false;
+          }
+
+          // Check if the bid-ask spread is within the specified range
+          if (bidAskSpread && (stock.bidAskSpread < bidAskSpread.min || stock.bidAskSpread > bidAskSpread
