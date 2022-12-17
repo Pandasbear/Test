@@ -103,32 +103,67 @@
       <tbody id="results-body"></tbody>
     </table>
 
-    <script>
-      const API_URL = 'https://api.boerse-frankfurt.de/data/stock_search';
-      const NEWS_API_URL = 'https://api.boerse-frankfurt.de/data/news';
-      const CHART_API_URL = 'https://api.boerse-frankfurt.de/data/chart';
+    <const API_URL = 'https://api.boerse-frankfurt.de/data/stock_search';
+const NEWS_API_URL = 'https://api.boerse-frankfurt.de/data/news';
+const CHART_API_URL = 'https://api.boerse-frankfurt.de/data/chart';
 
-      const filterForm = document.getElementById('filter-form');
-      const resultsBody = document.getElementById('results-body');
+const filterForm = document.getElementById('filter-form');
+const resultsBody = document.getElementById('results-body');
 
-      filterForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+filterForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-        // Get the filter parameters from the form
-        const volumeRange = document.getElementById('volume-range').value;
-        const bidAskSpread = document.getElementById('bid-ask-spread').value;
-        const priceRange = document.getElementById('price-range').value;
+  // Get the filter parameters from the form
+  const volumeRange = document.getElementById('volume-range').value;
+  const bidAskSpread = document.getElementById('bid-ask-spread').value;
+  const priceRange = document.getElementById('price-range').value;
 
-        // Make a request to the API to get the stock data
-        const response = await fetch(API_URL);
-        const data = await response.json();
+  // Make a request to the API to get the stock data
+  const response = await fetch(API_URL);
+  const data = await response.json();
 
-        // Filter the data based on the user-specified parameters
-        const filteredData = data.filter((stock) => {
-          // Check if the volume is within the specified range
-          if (volumeRange && (stock.volume < volumeRange.min || stock.volume > volumeRange.max)) {
-            return false;
-          }
+  // Filter the data based on the user-specified parameters
+  const filteredData = data.filter((stock) => {
+    return (
+      (volumeRange === '' || (stock.average_volume >= volumeRange[0] && stock.average_volume <= volumeRange[1])) &&
+      (bidAskSpread === '' || (stock.bid_ask_spread >= bidAskSpread[0] && stock.bid_ask_spread <= bidAskSpread[1])) &&
+      (priceRange === '' || (stock.price >= priceRange[0] && stock.price <= priceRange[1]))
+    );
+  });
 
-          // Check if the bid-ask spread is within the specified range
-          if (bidAskSpread && (stock.bidAskSpread < bidAskSpread.min || stock.bidAskSpread > bidAskSpread
+  // Clear the table body
+  resultsBody.innerHTML = '';
+
+  // Populate the table with the filtered data
+  filteredData.forEach((stock) => {
+    // Create a new row for the stock
+    const row = document.createElement('tr');
+
+    // Create cells for the stock name, ticker symbol, day range, average volume, industry, and news
+    const nameCell = document.createElement('td');
+    nameCell.textContent = stock.name;
+    row.appendChild(nameCell);
+
+    const tickerCell = document.createElement('td');
+    tickerCell.textContent = stock.ticker_symbol;
+    row.appendChild(tickerCell);
+
+    const rangeCell = document.createElement('td');
+    rangeCell.textContent = `${stock.day_range_low} - ${stock.day_range_high}`;
+    row.appendChild(rangeCell);
+
+    const volumeCell = document.createElement('td');
+    volumeCell.textContent = stock.average_volume;
+    row.appendChild(volumeCell);
+
+    const industryCell = document.createElement('td');
+    industryCell.textContent = stock.industry;
+    row.appendChild(industryCell);
+
+    const newsCell = document.createElement('td');
+    // Create a button to show the news for the stock
+    const newsButton = document.createElement('button');
+    newsButton.textContent = 'News';
+    newsButton.addEventListener('click', async () => {
+      // Make a request to the news
+
