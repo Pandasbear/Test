@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #lookup-form {
+        width: 500px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      #lookup-form label {
+        display: block;
+        margin-bottom: 0.5em;
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+
+      #lookup-form input[type="text"] {
+        width: 60%;
+        padding: 0.5em;
+        font-size: 1.2em;
+      }
+
+      #lookup-form input[type="submit"] {
+        width: 20%;
+        padding: 0.5em;
+        font-size: 1.2em;
+        background-color: lightblue;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="lookup-form">
+      <label for="symbol">Stock Symbol:</label><br>
+      <input type="text" id="symbol" name="symbol"><br>
+      <input type="submit" value="Look Up">
+    </form> 
+    <script>
+      document.getElementById("lookup-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const symbol = document.getElementById("symbol").value;
+        const apiKey = "fcf9223d-1f9e-48c5-bc81-2909e8063d83";
+        const apiUrl = `https://api.developer.deutsche-boerse.com/accesstot7-referencedata-1-1-0/instruments/v1/instruments?symbol=${symbol}&apiKey=${apiKey}`;
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            const instrument = data.instruments[0];
+            const name = instrument.name;
+            const price = instrument.lastPrice;
+            const currency = instrument.currency;
+            console.log(`${name} (${symbol}): ${price} ${currency}`);
+          })
+          .catch(error => console.error(error));
+      });
+    </script>
+  </body>
+</html>
