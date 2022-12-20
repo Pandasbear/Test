@@ -1,0 +1,43 @@
+<!-- HTML stock screener -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock Screener</title>
+</head>
+<body>
+  <!-- Form for user to input filter parameters -->
+  <form>
+    <label for="volume-min">Minimum volume:</label><br>
+    <input type="number" id="volume-min" name="volume-min"><br>
+    <label for="volume-max">Maximum volume:</label><br>
+    <input type="number" id="volume-max" name="volume-max"><br>
+    <label for="bid-ask-spread-min">Minimum bid-ask spread:</label><br>
+    <input type="number" id="bid-ask-spread-min" name="bid-ask-spread-min"><br>
+    <label for="bid-ask-spread-max">Maximum bid-ask spread:</label><br>
+    <input type="number" id="bid-ask-spread-max" name="bid-ask-spread-max"><br>
+    <label for="price-range-min">Minimum price range:</label><br>
+    <input type="number" id="price-range-min" name="price-range-min"><br>
+    <label for="price-range-max">Maximum price range:</label><br>
+    <input type="number" id="price-range-max" name="price-range-max"><br><br>
+    <input type="submit" value="Submit">
+  </form> 
+  <!-- Div to display the matching stocks -->
+  <div id="results">
+  </div>
+  <!-- Javascript to retrieve data from API and display matching stocks -->
+  <script>
+    // Get user input values
+    const volumeMin = document.getElementById('volume-min').value;
+    const volumeMax = document.getElementById('volume-max').value;
+    const bidAskSpreadMin = document.getElementById('bid-ask-spread-min').value;
+    const bidAskSpreadMax = document.getElementById('bid-ask-spread-max').value;
+    const priceRangeMin = document.getElementById('price-range-min').value;
+    const priceRangeMax = document.getElementById('price-range-max').value;
+    // Make API call to retrieve data
+    fetch(`https://api.developer.deutsche-boerse.com/accesstot7-referencedata-1-1-0/stocks?apikey=fcf9223d-1f9e-48c5-bc81-2909e8063d83`)
+      .then(response => response.json())
+      .then(data => {
+        // Filter data based on user input values
+        const filteredData = data.filter(stock => {
+          return stock.volume >= volumeMin && stock.volume <= volumeMax
+            && stock.bidAskSpread >= bidAskSpreadMin && stock.bidAskSpread <= bidAskSpreadMax
